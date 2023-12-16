@@ -1,2 +1,2 @@
 # helm-charts
-EvoluticsTech Helm Charts
+EvoluticsTech Helm Charts For Deployment To Kubernetes Cluster.
