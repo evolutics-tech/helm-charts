@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+    environment{
+        DOCKERHUB_TOKEN=credentials('dockerhub-token')
+        GIT_REPO_URL="git@gitlab.com:evolutics_tech/nas-service.git"
+        GIT_BRANCH="dev"
+        APP_NAME="nas-service-dev"
+        KUBE_MANIFEST="nas-service-dev.yaml"
+        NAMESPACE="backend"
+    }
+    stages {
+    stage('Build To DockerHub') {
+        steps{
+            sh('''
+            rm -rf *
+            git clone -b $GIT_BRANCH $GIT_REPO_URL
+            DIR_CD=$(basename $GIT_REPO_URL | awk -F '.' '{print $1}')
+            mv $DIR_CD/$KUBE_MANIFEST $KUBE_MANIFEST && cd $DIR_CD
+            docker login -u evoluticstech https://index.docker.io/v1/ -p $DOCKERHUB_TOKEN
+            docker build -t evoluticstech/$APP_NAME:$BUILD_NUMBER .
+            docker push evoluticstech/$APP_NAME:$BUILD_NUMBER
+            docker system prune --all --force
+        ''')
+        }
+    }
+    stage('Deploy To Kubernetes') {
+        steps{
+            sh('''
+            envsubst < /var/lib/jenkins/kubeconfigs/ets-docker.yaml | kubectl apply -f -
+            helm repo add evoluticstech https://helm.evoluticstech.com && helm repo update
+            helm upgrade $APP_NAME --install -n $NAMESPACE --set-string app.repository=evoluticstech/$APP_NAME --set-string app.tag=$BUILD_NUMBER evoluticstech/evolutics --create-namespace -f $KUBE_MANIFEST
+        ''')
+        }
+    }
+    }
+}
