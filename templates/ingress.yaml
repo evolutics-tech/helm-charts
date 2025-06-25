@@ -28,14 +28,14 @@ spec:
 
   tls:
     - hosts:
-        - {{ .Values.ingress.host | quote }}
-      secretName: {{ .Values.ingress.host | quote }}
+        - {{ .Values.ingress.url | quote }}
+      secretName: {{ .Values.ingress.url | quote }}
 
   rules:
-    - host: {{ .Values.ingress.host | quote }}
+    - host: {{ .Values.ingress.url | quote }}
       http:
         paths:
-          - path: {{ printf "/%s" (.Values.ingress.path | default "") | trimSuffix "/" | quote }}
+          - path: {{ .Values.ingress.path | default "/" | quote }}
             pathType: {{ .Values.ingress.pathType | default "ImplementationSpecific" }}
             backend:
               service:

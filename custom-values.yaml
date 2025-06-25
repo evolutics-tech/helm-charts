@@ -1,40 +1,35 @@
 replicaCount: 1
 
 app:
-  repository: evoluticstech/core-event-service
-  tag: 5
-  port: 8012
-
+  repository: evoluticstech/nas-service-dev
+  tag: 39
+  port: 8755
 env_secrets:
   enabled: false
   name: evolutics
-
 imagecredentials:
   enabled: true
-  name: nas-prod
-
+  name: ets-docker
 service:
   type: ClusterIP
   port: 80
-
 ingress:
   enabled: true
-  host: ets-test4.evoluticstech.com
-
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 1000M
+  url: nas-service.evoluticstech.com
+  path: /hello-sa
 autoscaling:
   enabled: false
   minReplicas: 2
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
-
 volumes: []
 volumeMounts: []
-
 extraenv:
   enabled: false
   NAME: hello
   ENV: prod
-
 liveness:
   enabled: false
   config:
@@ -43,7 +38,6 @@ liveness:
       port: http
     initialDelaySeconds: 5
     periodSeconds: 10
-
 readiness:
   enabled: false
   config:
@@ -52,8 +46,6 @@ readiness:
       port: http
     initialDelaySeconds: 5
     periodSeconds: 10
-
-
 issuer:
   enabled: false
   name: letsencrypt
