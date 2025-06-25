@@ -28,7 +28,10 @@ pipeline {
             sh('''
             envsubst < /var/lib/jenkins/kubeconfigs/ets-docker.yaml | kubectl apply -f -
             helm repo add evoluticstech https://helm.evoluticstech.com && helm repo update
-            helm upgrade $APP_NAME --install -n $NAMESPACE --set-string app.repository=evoluticstech/$APP_NAME --set-string app.tag=$BUILD_NUMBER evoluticstech/evolutics --create-namespace -f $KUBE_MANIFEST
+            helm upgrade $APP_NAME --install -n $NAMESPACE \
+              --set-string app.repository=evoluticstech/$APP_NAME \
+              --set-string app.tag=$BUILD_NUMBER evoluticstech/evolutics \
+              --create-namespace -f $KUBE_MANIFEST
         ''')
         }
     }
