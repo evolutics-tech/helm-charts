@@ -3,12 +3,12 @@ entries:
   evolutics:
   - apiVersion: v2
     appVersion: 1.17.0
-    created: "2025-06-26T00:30:14.805575+01:00"
+    created: "2025-06-26T00:36:53.123286+01:00"
     description: A Helm chart for Kubernetes
-    digest: 494e6f2d39b38d61c2e907662aa050a4d30674bdbad681a282d4dcdc98907ceb
+    digest: b32b056f5ef5fba93cb91af47652ae5069fcbffc8d9a23b8bfc6a774e813524d
     name: evolutics
     type: application
     urls:
     - charts/evolutics-0.2.2.tgz
     version: 0.2.2
-generated: "2025-06-26T00:30:14.803153+01:00"
+generated: "2025-06-26T00:36:53.120752+01:00"

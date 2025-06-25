@@ -1,15 +1,19 @@
 1. Get the application URL by running these commands:
 
-{{- if and .Values.ingress.enabled .Values.ingress.host }}
+{{- if and .Values.ingress.enabled .Values.ingress.url }}
   {{- $scheme := "http" }}
   {{- if .Values.ingress.tls }}
     {{- $scheme = "https" }}
   {{- end }}
-  {{- $path := "/" }}
-  {{- if .Values.ingress.path }}
-    {{- $path = printf "/%s" .Values.ingress.path | trimSuffix "/" | replace "//" "/" }}
+  {{- $path := .Values.ingress.path | default "/" }}
+  {{- if not (hasPrefix $path "/") }}
+    {{- $path = print "/" $path }}
   {{- end }}
-  {{ printf "%s://%s%s" $scheme .Values.ingress.host $path }}
+  {{- $path = trimSuffix "/" $path }}
+  {{- if eq $path "" }}
+    {{- $path = "/" }}
+  {{- end }}
+  {{ printf "\n  Visit %s://%s%s\n" $scheme .Values.ingress.url $path }}
 {{- else if contains "NodePort" .Values.service.type }}
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "evolutics.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
