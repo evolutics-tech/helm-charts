@@ -19,25 +19,23 @@ service:
 
 ingress:
   enabled: true
-  annotations:
-    kubernetes.io/ingress.class: haproxy
   host: ets-test4.evoluticstech.com
-  path: swaggerr
 
 autoscaling:
   enabled: false
   minReplicas: 2
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
+  
 volumes: []
 volumeMounts: []
 
 extraenv:
-  enabled: true
+  enabled: false
   NAME: hello
   ENV: prod
 
-livenessProbe:
+liveness:
   enabled: false
   config:
     httpGet:
@@ -46,7 +44,7 @@ livenessProbe:
     initialDelaySeconds: 5
     periodSeconds: 10
 
-readinessProbe:
+readiness:
   enabled: false
   config:
     httpGet:
@@ -54,6 +52,7 @@ readinessProbe:
       port: http
     initialDelaySeconds: 5
     periodSeconds: 10
+
 
 issuer:
   enabled: false

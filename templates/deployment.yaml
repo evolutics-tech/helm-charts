@@ -23,77 +23,90 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- if and .Values.imagecredentials.enabled .Values.imagecredentials.name }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+        - name: {{ .Values.imagecredentials.name }}
       {{- end }}
+
       serviceAccountName: {{ include "evolutics.serviceAccountName" . }}
+
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       containers:
         - name: {{ .Chart.Name }}
+
           {{- with .Values.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          image: "{{ .Values.app.repository }}:{{ .Values.app.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.app.pullpolicy | default "Always" }}
+
           ports:
             - name: http
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.app.port }}
               protocol: TCP
-          {{- with .Values.livenessProbe }}
+
+          {{- with .Values.liveness }}
+            {{- if and .enabled .config }}
           livenessProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml .config | nindent 12 }}
+            {{- end }}
           {{- end }}
-          {{- with .Values.readinessProbe }}
+
+          {{- with .Values.readiness }}
+            {{- if and .enabled .config }}
           readinessProbe:
-            {{- toYaml . | nindent 12 }}
+            {{- toYaml .config | nindent 12 }}
+            {{- end }}
           {{- end }}
+
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
 
-          {{- if .Values.extraEnv.enabled }}
+          {{- if .Values.extraenv.enabled }}
           env:
-          {{- range $key, $val := .Values.extraEnv.values }}
-            - name: {{ $key }}
-              value: "{{ $val }}"
-          {{- end }}
+            {{- range $key, $val := .Values.extraenv }}
+              {{- if ne $key "enabled" }}
+              - name: {{ $key }}
+                value: "{{ $val }}"
+              {{- end }}
+            {{- end }}
           {{- end }}
 
-
-          {{ if .Values.env_secrets.enabled }}
+          {{- if .Values.env_secrets.enabled }}
           envFrom:
-          - secretRef:
-              name: {{ .Values.env_secrets.name }}
-        {{ end }}
+            - secretRef:
+                name: {{ .Values.env_secrets.name }}
+          {{- end }}
 
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
-
-
-
-

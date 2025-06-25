@@ -1,0 +1,19 @@
+{{- if .Values.issuer.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ .Values.issuer.name | default "letsencrypt" }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "evolutics.labels" . | nindent 4 }}
+spec:
+  acme:
+    email: devops@evoluticstech.com
+    privateKeySecretRef:
+      name: letsencrypt-account-key
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+      - http01:
+          ingress:
+            class: {{ .Values.issuer.ingressClass }}
+{{- end }}
